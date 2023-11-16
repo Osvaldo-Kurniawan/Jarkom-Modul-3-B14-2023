@@ -826,3 +826,5 @@ server {
     }
 }' > /etc/nginx/sites-available/lb_php
 ```
+Hasilnya forbiden seperti berikut :
+<img width="399" alt="image" src="https://github.com/Osvaldo-Kurniawan/Jarkom-Modul-3-B14-2023/assets/108170210/4b8ee0cf-53d3-46f7-ab89-16438f640d8a">

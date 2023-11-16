@@ -733,21 +733,52 @@ htpasswd -c /etc/nginx/rahasisakita/htpasswd netics
 
 Lalu, masukkan passwordnya ``ajkb14``
 
-Jika sudah memasukkan ``password`` dan ``re-type password``. Sekarang bisa dicoba dengan menambahkan command berikut pada setup nginx.
+Jika sudah memasukkan ``password`` dan ``re-type password``. Sekarang bisa dicoba dengan menjalankan command berikut pada setup nginx.
 
-```sh
-auth_basic "Restricted Content";
-auth_basic_user_file /etc/nginx/rahasisakita/htpasswd;
+```
+echo '
+upstream backend  {
+        server 192.185.4.1 weight=640; #IP Lawine
+        server 192.185.4.2 weight=200; #IP Linie
+        server 192.185.4.3 weight=25; #IP Lugner
+}
+
+server {
+        listen 80;
+        server_name granz.channel.b14.com www.granz.channel.b14.com;
+
+        location / {
+                proxy_pass http://backend;
+                proxy_set_header    X-Real-IP $remote_addr;
+                proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header    Host $http_host;
+
+        }
+        auth_basic "Restricted Content";
+        auth_basic_user_file /etc/nginx/rahasisakita/htpasswd;
+        error_log /var/log/nginx/lb_error.log;
+        access_log /var/log/nginx/lb_access.log;
+
+}' > /etc/nginx/sites-available/lb-eisen
+rm -f /etc/nginx/sites-enabled/lb-eisen
+ln -s /etc/nginx/sites-available/lb-eisen /etc/nginx/sites-enabled
+service nginx restart
 ```
 
 Hasilnya akan mebatasi pengguna yang mengakses url ``http://www.granz.channel.b14.com/`` akan unauthorized sebagai berikut 
+
+
 <img width="320" alt="image" src="https://github.com/Osvaldo-Kurniawan/Jarkom-Modul-3-B14-2023/assets/108170210/e4eeae4f-6266-473f-a7fb-c4baa33ccbe6">
+
 
 <img width="331" alt="image" src="https://github.com/Osvaldo-Kurniawan/Jarkom-Modul-3-B14-2023/assets/108170210/e5a9c42e-a26c-4bd2-8e65-a5da5659b5fc">
 
+
 <img width="77" alt="image" src="https://github.com/Osvaldo-Kurniawan/Jarkom-Modul-3-B14-2023/assets/108170210/15831fe2-c7c8-4b74-a948-adeb0546687d">
 
+
 <img width="397" alt="image" src="https://github.com/Osvaldo-Kurniawan/Jarkom-Modul-3-B14-2023/assets/108170210/4bbcccea-41da-4174-99c9-9973213b9ad6">
+
 
 ## No 11
 Lalu buat untuk setiap request yang mengandung /its akan di proxy passing menuju halaman https://www.its.ac.id. hint: (proxy_pass)

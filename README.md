@@ -740,4 +740,89 @@ auth_basic "Restricted Content";
 auth_basic_user_file /etc/nginx/rahasisakita/htpasswd;
 ```
 
-Hasilnya akan mebatasi pengguna yang mengakses url ``http://www.granz.channel.a09.com/`` akan unauthorized sebagai berikut 
+Hasilnya akan mebatasi pengguna yang mengakses url ``http://www.granz.channel.b14.com/`` akan unauthorized sebagai berikut 
+<img width="320" alt="image" src="https://github.com/Osvaldo-Kurniawan/Jarkom-Modul-3-B14-2023/assets/108170210/e4eeae4f-6266-473f-a7fb-c4baa33ccbe6">
+
+<img width="331" alt="image" src="https://github.com/Osvaldo-Kurniawan/Jarkom-Modul-3-B14-2023/assets/108170210/e5a9c42e-a26c-4bd2-8e65-a5da5659b5fc">
+
+<img width="77" alt="image" src="https://github.com/Osvaldo-Kurniawan/Jarkom-Modul-3-B14-2023/assets/108170210/15831fe2-c7c8-4b74-a948-adeb0546687d">
+
+<img width="397" alt="image" src="https://github.com/Osvaldo-Kurniawan/Jarkom-Modul-3-B14-2023/assets/108170210/4bbcccea-41da-4174-99c9-9973213b9ad6">
+
+## No 11
+Lalu buat untuk setiap request yang mengandung /its akan di proxy passing menuju halaman https://www.its.ac.id. hint: (proxy_pass)
+
+Ubah konfigurasi lb-php sebagai berikut :
+```
+echo 'upstream worker {
+    server 192.185.3.1;
+    server 192.185.3.2;
+    server 192.185.3.3;
+}
+
+server {
+    listen 80;
+    server_name granz.channel.b14.com www.granz.channel.b14.com;
+
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+
+    location / {
+        proxy_pass http://worker;
+    }
+
+    location ~ /its {
+        proxy_pass https://www.its.ac.id;
+        proxy_set_header Host www.its.ac.id;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}' > /etc/nginx/sites-available/lb_php
+```
+
+Maksudnya adalah ketika kita melakukan akses pada endpoint yang mengandung ``/its`` akan diarahkan oleh ``proxy_pass`` menuju ``https://www.its.ac.id``. Jadi ketika melakukan testing pada client ``Revolte`` dengan menggunakan perintah berikut 
+
+```
+lynx www.granz.channel.b14.com/its
+```
+
+Hasilnya sebagai berikut :
+<img width="840" alt="image" src="https://github.com/Osvaldo-Kurniawan/Jarkom-Modul-3-B14-2023/assets/108170210/66b6098d-8d28-449b-9ec4-116e7a537d8d">
+
+## No 12
+Selanjutnya LB ini hanya boleh diakses oleh client dengan IP [Prefix IP].3.69, [Prefix IP].3.70, [Prefix IP].4.167, dan [Prefix IP].4.168.
+
+edit konfigurasi load balancer sebagai berikut :
+```
+echo 'upstream worker {
+    server 192.185.4.1;
+    server 192.185.4.2;
+    server 192.185.4.3;
+}
+
+server {
+    listen 80;
+    server_name granz.channel.a09.com www.granz.channel.a09.com;
+
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+
+    location / {
+        allow 192.185.3.69;
+        allow 192.185.3.70;
+        allow 192.185.4.167;
+        allow 192.185.4.168;
+        deny all;
+        proxy_pass http://worker;
+    }
+
+    location /its {
+        proxy_pass https://www.its.ac.id;
+        proxy_set_header Host www.its.ac.id;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}' > /etc/nginx/sites-available/lb_php
+```

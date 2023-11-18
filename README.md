@@ -7,6 +7,9 @@ praktikum jaringan komputer 2023
 |Gabrielle Immanuel Osvaldo Kurniawan | 5025211135 |
 |Muhammad Arkan Karindra Darvesh | 5025211236 |
 
+## Kendala
+- dalam pengerjaan seringkali terjadi error yang tidak ada keterangan sehingga debug memakan waktu yang sangat lama
+
 ## TOPOLOGI
 <img width="733" alt="image" src="https://github.com/Osvaldo-Kurniawan/Jarkom-Modul-3-B14-2023/assets/108170210/0b826349-96ee-4ece-9957-6af27eea63c2">
 
